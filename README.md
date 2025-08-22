@@ -1,50 +1,254 @@
-## Installation & updates
-# to-do-list-srn# CodeIgniter 4 Application Starter
+# 📝 To-Do List Application
 
-## What is CodeIgniter?
+Una aplicación web completa para gestión de tareas desarrollada con CodeIgniter 4, Docker, MySQL y JavaScript vanilla.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## 🏗️ Arquitectura del Proyecto
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+- **Backend**: CodeIgniter 4 (PHP 8.2)
+- **Frontend**: HTML5, CSS3, JavaScript ES6+
+- **Base de Datos**: MySQL 8.0
+- **Containerización**: Docker & Docker Compose
+- **Testing**: PHPUnit
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## 🚀 Instalación y Configuración
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+### Prerrequisitos
 
-## Installation & updates
+- Docker Desktop
+- Git
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+### Pasos de Instalación
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/apizarro1204/to-do-list-srn.git
+   cd to-do-list-srn
+   ```
 
-## Setup
+2. **Configurar entorno**
+   ```bash
+   # El archivo .env ya está configurado para Docker
+   # No necesitas modificarlo para un setup básico
+   ```
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+3. **Levantar los servicios con Docker**
+   ```bash
+   docker-compose up -d --build
+   ```
 
-## Important Change with index.php
+4. **Verificar instalación**
+   - Aplicación: http://localhost:8080
+   - Base de datos MySQL: localhost:3306
 
+### 🏃‍♂️ Comandos Útiles
 
-2. Levanta los servicios con Docker
+```bash
+# Ver logs de la aplicación
+docker-compose logs app
 
-```
+# Ver logs de la base de datos
+docker-compose logs db
+
+# Ejecutar comandos dentro del contenedor
+docker exec -it codeigniter_app bash
+
+# Detener servicios
+docker-compose down
+
+# Rebuildar después de cambios
 docker-compose up -d --build
 ```
-Esto construye la imagen personalizada, instala dependencias y levanta la app y la base de datos MySQL.
 
-**Nota importante:**
-El directorio `vendor/` (donde están las dependencias de Composer y el framework CodeIgniter) no se sube a GitHub. Por eso, el Dockerfile está configurado para instalar automáticamente todas las dependencias de Composer al construir la imagen. Así, no necesitas ejecutar `composer install` manualmente dentro del contenedor.
+## 📋 Funcionalidades
 
-## Important Change with index.php
+### ✅ Gestión de Tareas (CRUD Completo)
+- ➕ Crear nuevas tareas
+- 📝 Editar título de tareas existentes
+- ✔️ Marcar tareas como completadas/pendientes
+- 🗑️ Eliminar tareas (con confirmación)
+- 📊 Visualización en tiempo real
 
-**Please** read the user guide for a better explanation of how CI4 works!
+### 🔧 Características Técnicas
+- 🌐 API REST completa
+- ⚡ Interfaz reactiva con AJAX
+- 🎨 Diseño responsivo
+- 🔔 Notificaciones de usuario
+- ⚠️ Manejo robusto de errores
+- 📱 Optimización móvil
+
+## 🧪 Testing
+
+### Ejecutar Pruebas Unitarias
+
+```bash
+# Dentro del contenedor
+docker exec -it codeigniter_app bash
+vendor/bin/phpunit
+
+# O directamente
+docker exec -it codeigniter_app vendor/bin/phpunit
+```
+
+### Cobertura de Pruebas
+- ✅ TaskModel: Operaciones CRUD
+- ✅ Validaciones de datos
+- ✅ Estados de completado
+- ✅ Casos de error
+
+## 🗄️ Estructura de Base de Datos
+
+```sql
+CREATE TABLE tasks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    completed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## 🛠️ API Endpoints
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/tasks` | Obtener todas las tareas |
+| GET | `/tasks/{id}` | Obtener tarea específica |
+| POST | `/tasks` | Crear nueva tarea |
+| PUT | `/tasks/{id}` | Actualizar tarea |
+| DELETE | `/tasks/{id}` | Eliminar tarea |
+
+### Ejemplos de Uso
+
+```javascript
+// Crear tarea
+fetch('/tasks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: 'Nueva tarea' })
+})
+
+// Actualizar tarea
+fetch('/tasks/1', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ completed: true })
+})
+```
+
+## 📁 Estructura del Proyecto
+
+```
+to-do-list-srn/
+├── app/
+│   ├── Controllers/
+│   │   ├── Home.php
+│   │   └── Tasks.php
+│   ├── Models/
+│   │   └── TaskModel.php
+│   ├── Database/
+│   │   └── Migrations/
+│   └── Config/
+├── public/
+│   ├── css/
+│   │   └── todo.css
+│   ├── js/
+│   │   └── todo.js
+│   └── todo.html
+├── tests/
+│   └── app/
+│       └── TaskModelTest.php
+├── docker-compose.yml
+├── Dockerfile
+└── README.md
+```
+
+## 🔧 Configuración de Desarrollo
+
+### Variables de Entorno (.env)
+```ini
+CI_ENVIRONMENT = development
+app.baseURL = 'http://localhost:8080'
+database.default.hostname = db
+database.default.database = codeigniter
+database.default.username = ci_user
+database.default.password = ci_pass
+```
+
+### Docker Services
+- **app**: Aplicación CodeIgniter (Puerto 8080)
+- **db**: Base de datos MySQL (Puerto 3306)
+
+## 🌿 Gestión de Branches
+
+El proyecto utiliza GitFlow:
+- `main`: Código en producción
+- `dev`: Desarrollo activo
+- `feature/*`: Nuevas funcionalidades
+- `fix/*`: Correcciones de bugs
+
+## 📊 Mejoras y Características Implementadas
+
+### 🎯 Calidad de Código
+- ✅ Documentación PHPDoc completa
+- ✅ Separación de responsabilidades
+- ✅ Manejo robusto de errores
+- ✅ Validación de datos
+- ✅ Código limpio y legible
+
+### 🎨 Experiencia de Usuario
+- ✅ Notificaciones en tiempo real
+- ✅ Indicadores de carga
+- ✅ Confirmaciones de acciones
+- ✅ Diseño responsivo
+- ✅ Accesibilidad mejorada
+
+### 🔒 Seguridad
+- ✅ Validación de entrada
+- ✅ Sanitización de datos
+- ✅ Manejo seguro de errores
+- ✅ Headers HTTP apropiados
+
+## 🐛 Resolución de Problemas
+
+### Problemas Comunes
+
+1. **Puerto 8080 ocupado**
+   ```bash
+   # Cambiar puerto en docker-compose.yml
+   ports:
+     - "8081:80"
+   ```
+
+2. **Problemas de permisos**
+   ```bash
+   docker exec -it codeigniter_app chown -R www-data:www-data /var/www/html/writable
+   ```
+
+3. **Base de datos no conecta**
+   ```bash
+   # Verificar logs
+   docker-compose logs db
+   ```
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crear branch de feature (`git checkout -b feature/AmazingFeature`)
+3. Commit cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push al branch (`git push origin feature/AmazingFeature`)
+5. Abrir Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
+
+## 👨‍💻 Autor
+
+**apizarro1204**
+- GitHub: [@apizarro1204](https://github.com/apizarro1204)
+
+---
+
+⭐ ¡Dale una estrella si este proyecto te fue útil!
 
 ## Repository Management
 

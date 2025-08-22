@@ -1,3 +1,4 @@
+## Installation & updates
 # to-do-list-srn# CodeIgniter 4 Application Starter
 
 ## What is CodeIgniter?
@@ -30,12 +31,18 @@ and any database settings.
 
 ## Important Change with index.php
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+2. Levanta los servicios con Docker
+
+```
+docker-compose up -d --build
+```
+Esto construye la imagen personalizada, instala dependencias y levanta la app y la base de datos MySQL.
+
+**Nota importante:**
+El directorio `vendor/` (donde están las dependencias de Composer y el framework CodeIgniter) no se sube a GitHub. Por eso, el Dockerfile está configurado para instalar automáticamente todas las dependencias de Composer al construir la imagen. Así, no necesitas ejecutar `composer install` manualmente dentro del contenedor.
+
+## Important Change with index.php
 
 **Please** read the user guide for a better explanation of how CI4 works!
 

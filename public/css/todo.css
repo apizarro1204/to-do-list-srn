@@ -83,8 +83,106 @@ button:hover {
 .delete-btn:hover {
     background: #a71d2a;
 }
-.complete-checkbox {
-    margin-right: 4px;
-    width: 18px;
-    height: 18px;
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification-success {
+    background: #28a745;
+}
+
+.notification-error {
+    background: #dc3545;
+}
+
+.notification-info {
+    background: #17a2b8;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Loading styles */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Improved form validation styles */
+.form-error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-success {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Better responsive design */
+@media (max-width: 480px) {
+    .container {
+        margin: 20px;
+        padding: 1em;
+    }
+    
+    .task-item {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    
+    .edit-btn, .save-btn, .delete-btn {
+        padding: 0.2em 0.5em;
+        font-size: 0.9em;
+    }
+}
+
+/* Accessibility improvements */
+.task-item:focus-within {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+button:focus,
+input:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
 }

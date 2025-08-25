@@ -26,9 +26,8 @@ class CreateTasksTable extends Migration
                 'null'       => false,
             ],
             'created_at' => [
-                'type'    => 'TIMESTAMP',
-                'default' => 'CURRENT_TIMESTAMP',
-                'null'    => false,
+                'type'    => 'DATETIME',
+                'null'    => true,
             ],
         ]);
 

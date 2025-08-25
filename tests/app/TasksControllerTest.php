@@ -50,9 +50,11 @@ class TasksControllerTest extends CIUnitTestCase
 
     public function testCreateTaskWithoutTitle(): void
     {
-        $result = $this->post('/tasks', []);
+        $result = $this->withHeaders(['Content-Type' => 'application/json'])
+                       ->withBody(json_encode([]))
+                       ->post('/tasks');
         
-        $result->assertStatus(400);
+        $result->assertStatus(422);
         $result->assertJSONFragment(['error' => 'No data provided']);
     }
 
@@ -80,7 +82,9 @@ class TasksControllerTest extends CIUnitTestCase
     public function testUpdateNonExistentTask(): void
     {
         $updateData = ['title' => 'Updated Title'];
-        $result = $this->put('/tasks/999', $updateData);
+        $result = $this->withHeaders(['Content-Type' => 'application/json'])
+                       ->withBody(json_encode($updateData))
+                       ->put('/tasks/999');
         
         $result->assertStatus(404);
         $result->assertJSONFragment(['error' => 'Task not found']);
@@ -131,5 +135,48 @@ class TasksControllerTest extends CIUnitTestCase
         
         $result->assertStatus(404);
         $result->assertJSONFragment(['error' => 'Task not found']);
+    }
+
+    // Additional "sad path" tests for better coverage
+    public function testCreateTaskWithEmptyTitle(): void
+    {
+        $taskData = ['title' => ''];
+
+        $result = $this->withHeaders(['Content-Type' => 'application/json'])
+                       ->withBody(json_encode($taskData))
+                       ->post('/tasks');
+        
+        $result->assertStatus(422);
+        $result->assertJSONFragment(['error' => 'Title is required']);
+    }
+
+    public function testCreateTaskWithTooLongTitle(): void
+    {
+        $taskData = ['title' => str_repeat('a', 256)]; // 256 characters, limit is 255
+
+        $result = $this->withHeaders(['Content-Type' => 'application/json'])
+                       ->withBody(json_encode($taskData))
+                       ->post('/tasks');
+        
+        $result->assertStatus(422);
+        $result->assertJSONFragment(['error' => 'Title cannot exceed 255 characters']);
+    }
+
+    public function testUpdateTaskWithEmptyTitle(): void
+    {
+        // Create task first
+        $taskId = $this->db->table('tasks')->insert([
+            'title' => 'Original Title',
+            'completed' => false,
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        $updateData = ['title' => ''];
+        $result = $this->withHeaders(['Content-Type' => 'application/json'])
+                       ->withBody(json_encode($updateData))
+                       ->put("/tasks/{$taskId}");
+        
+        $result->assertStatus(422);
+        $result->assertJSONFragment(['error' => 'Title is required']);
     }
 }

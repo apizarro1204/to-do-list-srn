@@ -285,7 +285,7 @@ class Tasks extends BaseController
             if (empty($title)) {
                 return $this->response
                     ->setStatusCode(422)
-                    ->setJSON(['error' => 'Title cannot be empty']);
+                    ->setJSON(['error' => 'Title is required']);
             }
             
             if (strlen($title) > 255) {

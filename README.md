@@ -1,5 +1,9 @@
 # 📝 To-Do List Application
 
+## **Con respecto a al punto de mejora para el método DELETE, es correcto enviar un 200 ya que es la respuesta a que le proceso de borrado fue realizada con éxtio, luego no se hace una búsqueda del mismo id de tasks para que devuelva un 204. Por lo tanto no se aplica mejora según mi criterio.
+## ** Con respecto al Git Flow: Se realizan tareas dentro de la rama dev. De ella se crean nuevas ramas que realzian PRs a rama dev, tomando la rama dev como principal.
+
+
 Una aplicación web completa para gestión de tareas desarrollada con CodeIgniter 4, Docker, MySQL y JavaScript vanilla.
 
 ## 🏗️ Arquitectura del Proyecto

@@ -32,18 +32,39 @@ document.addEventListener('DOMContentLoaded', function () {
      */
     function handleApiResponse(response) {
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json().then(errorData => {
+                const errorMessage = errorData.error || `Error ${response.status}: ${response.statusText}`;
+                throw new Error(errorMessage);
+            }).catch(() => {
+                throw new Error(`Error ${response.status}: ${response.statusText}`);
+            });
         }
         return response.json();
     }
 
     /**
-     * Handle and display errors
+     * Handle and display errors with specific messages
      * @param {Error} error 
      */
     function handleError(error) {
         console.error('Error:', error);
-        showNotification('Error al procesar la solicitud', 'error');
+        
+        let userMessage = 'Error al procesar la solicitud';
+        
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            userMessage = 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+        } else if (error.message.includes('422')) {
+            userMessage = 'Datos inválidos: ' + error.message.replace('Error 422: ', '');
+        } else if (error.message.includes('404')) {
+            userMessage = 'La tarea no fue encontrada.';
+        } else if (error.message.includes('500')) {
+            userMessage = 'Error del servidor. Intenta nuevamente en unos momentos.';
+        } else if (error.message !== 'Error al procesar la solicitud') {
+            userMessage = error.message;
+        }
+        
+        showNotification(userMessage, 'error');
+        hideLoading();
     }
 
     /**
@@ -245,9 +266,25 @@ document.addEventListener('DOMContentLoaded', function () {
      * @returns {Promise}
      */
     function updateTaskTitle(task, newTitle) {
-        if (!newTitle || newTitle === task.title) {
-            fetchTasks();
+        // Client-side validation
+        const validation = validateTaskTitle(newTitle);
+        if (!validation.isValid) {
+            showNotification(validation.message, 'error');
+            fetchTasks(); // Revert UI
+            return Promise.reject(new Error(validation.message));
+        }
+
+        if (validation.title === task.title) {
+            fetchTasks(); // Revert UI
             return Promise.resolve();
+        }
+
+        const taskElement = document.querySelector(`[data-id="${task.id}"]`);
+        const saveBtn = taskElement?.querySelector('.save-btn');
+        
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Guardando...';
         }
 
         return fetch(`${API_BASE}/${task.id}`, {
@@ -256,12 +293,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ title: newTitle })
+            body: JSON.stringify({ title: validation.title })
         })
         .then(handleApiResponse)
-        .then(() => {
-            showNotification('Tarea actualizada correctamente', 'success');
+        .then(response => {
+            const message = response.message || 'Tarea actualizada correctamente';
+            showNotification(message, 'success');
             fetchTasks();
+        })
+        .catch(error => {
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Guardar';
+            }
+            handleError(error);
+            fetchTasks(); // Revert UI
         });
     }
 
@@ -297,6 +343,16 @@ document.addEventListener('DOMContentLoaded', function () {
      * @param {number} id 
      */
     function deleteTask(id) {
+        const taskElement = document.querySelector(`[data-id="${id}"]`);
+        const deleteBtn = taskElement?.querySelector('.delete-btn');
+        
+        if (deleteBtn) {
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = 'Eliminando...';
+        }
+        
+        showLoading();
+        
         fetch(`${API_BASE}/${id}`, { 
             method: 'DELETE',
             headers: {
@@ -304,11 +360,70 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
         .then(handleApiResponse)
-        .then(() => {
-            showNotification('Tarea eliminada correctamente', 'success');
+        .then(response => {
+            const message = response.message || 'Tarea eliminada correctamente';
+            showNotification(message, 'success');
             fetchTasks();
         })
-        .catch(handleError);
+        .catch(error => {
+            if (deleteBtn) {
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = 'Eliminar';
+            }
+            handleError(error);
+        })
+        .finally(() => {
+            hideLoading();
+        });
+    }
+
+    /**
+     * Validate task title on client side
+     * @param {string} title 
+     * @returns {object} Validation result with isValid and message
+     */
+    function validateTaskTitle(title) {
+        const trimmed = title.trim();
+        
+        if (!trimmed) {
+            return { isValid: false, message: 'El título es requerido' };
+        }
+        
+        if (trimmed.length < 3) {
+            return { isValid: false, message: 'El título debe tener al menos 3 caracteres' };
+        }
+        
+        if (trimmed.length > 255) {
+            return { isValid: false, message: 'El título no puede exceder 255 caracteres' };
+        }
+        
+        // Basic HTML/script tag detection
+        if (/<[^>]*>/g.test(trimmed)) {
+            return { isValid: false, message: 'El título no puede contener etiquetas HTML' };
+        }
+        
+        return { isValid: true, title: trimmed };
+    }
+
+    /**
+     * Set form loading state
+     * @param {boolean} isLoading 
+     */
+    function setFormLoading(isLoading) {
+        const submitButton = taskForm.querySelector('button[type="submit"]');
+        const titleInput = taskForm.querySelector('#task-title');
+        
+        if (isLoading) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Creando...';
+            titleInput.disabled = true;
+            taskForm.classList.add('loading');
+        } else {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Agregar Tarea';
+            titleInput.disabled = false;
+            taskForm.classList.remove('loading');
+        }
     }
 
     /**
@@ -318,11 +433,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function handleFormSubmit(e) {
         e.preventDefault();
         
-        const title = taskTitle.value.trim();
-        if (!title) {
-            showNotification('Por favor ingresa un título para la tarea', 'error');
+        const title = taskTitle.value;
+        
+        // Client-side validation
+        const validation = validateTaskTitle(title);
+        if (!validation.isValid) {
+            showNotification(validation.message, 'error');
+            taskTitle.focus();
             return;
         }
+
+        // Set loading state
+        setFormLoading(true);
 
         fetch(API_BASE, {
             method: 'POST',
@@ -330,19 +452,47 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ title })
+            body: JSON.stringify({ title: validation.title })
         })
         .then(handleApiResponse)
-        .then(() => {
+        .then(response => {
             taskTitle.value = '';
-            showNotification('Tarea creada correctamente', 'success');
+            const message = response.message || 'Tarea creada correctamente';
+            showNotification(message, 'success');
             fetchTasks();
         })
-        .catch(handleError);
+        .catch(handleError)
+        .finally(() => {
+            setFormLoading(false);
+        });
     }
 
     // Event listeners
     taskForm.addEventListener('submit', handleFormSubmit);
+    
+    // Real-time validation for title input
+    taskTitle.addEventListener('input', function() {
+        const validation = validateTaskTitle(this.value);
+        
+        if (this.value.length > 0) {
+            if (validation.isValid) {
+                this.classList.remove('input-error');
+                this.classList.add('form-success');
+            } else {
+                this.classList.add('input-error');
+                this.classList.remove('form-success');
+            }
+        } else {
+            this.classList.remove('input-error', 'form-success');
+        }
+    });
+    
+    // Clear validation styles when input is empty
+    taskTitle.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+            this.classList.remove('input-error', 'form-success');
+        }
+    });
 
     // Initialize app
     fetchTasks();

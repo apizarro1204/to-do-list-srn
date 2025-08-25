@@ -49,7 +49,7 @@ class Tasks extends BaseController
     {
         if (!$id || !is_numeric($id)) {
             return $this->response
-                ->setStatusCode(400)
+                ->setStatusCode(422)
                 ->setJSON(['error' => 'Invalid task ID']);
         }
 
@@ -112,9 +112,16 @@ class Tasks extends BaseController
             }
 
             $task = $this->taskModel->find($id);
+            $location = base_url("tasks/{$id}");
+            
+            // Se implementa sugerencia para mejorar código en respuesta 201
             return $this->response
                 ->setStatusCode(201)
-                ->setJSON($task);
+                ->setHeader('Location', $location)
+                ->setJSON([
+                    'message' => 'Tarea "' . $task['title'] . '" creada',
+                    'task' => $task
+                ]);
                 
         } catch (\Exception $e) {
             log_message('error', 'Error creating task: ' . $e->getMessage());
@@ -135,7 +142,7 @@ class Tasks extends BaseController
     {
         if (!$id || !is_numeric($id)) {
             return $this->response
-                ->setStatusCode(400)
+                ->setStatusCode(422)
                 ->setJSON(['error' => 'Invalid task ID']);
         }
 
@@ -176,7 +183,7 @@ class Tasks extends BaseController
 
             if (empty($updateData)) {
                 return $this->response
-                    ->setStatusCode(400)
+                    ->setStatusCode(422)
                     ->setJSON(['error' => 'No valid data provided for update']);
             }
 
@@ -213,7 +220,7 @@ class Tasks extends BaseController
     {
         if (!$id || !is_numeric($id)) {
             return $this->response
-                ->setStatusCode(400)
+                ->setStatusCode(422)
                 ->setJSON(['error' => 'Invalid task ID']);
         }
 
@@ -259,7 +266,7 @@ class Tasks extends BaseController
     {
         if (!$data) {
             return $this->response
-                ->setStatusCode(400)
+                ->setStatusCode(422)
                 ->setJSON(['error' => 'No data provided']);
         }
 

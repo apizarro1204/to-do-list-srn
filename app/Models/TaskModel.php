@@ -33,6 +33,34 @@ class TaskModel extends Model
     ];
 
     /**
+     * Override insert to automatically add created_at
+     */
+    public function insert($data = null, bool $returnID = true)
+    {
+        if (is_array($data)) {
+            // Always set created_at if not provided or if it's null
+            if (!isset($data['created_at']) || $data['created_at'] === null) {
+                $data['created_at'] = date('Y-m-d H:i:s');
+            }
+        }
+        
+        return parent::insert($data, $returnID);
+    }
+
+    /**
+     * Override update to prevent clearing created_at
+     */
+    public function update($id = null, $data = null): bool
+    {
+        // If created_at is being set to null, set it to current time instead
+        if (is_array($data) && isset($data['created_at']) && $data['created_at'] === null) {
+            $data['created_at'] = date('Y-m-d H:i:s');
+        }
+        
+        return parent::update($id, $data);
+    }
+
+    /**
      * Get all tasks ordered by creation date
      * 
      * @return array

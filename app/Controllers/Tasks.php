@@ -29,6 +29,13 @@ class Tasks extends BaseController
     {
         try {
             $tasks = $this->taskModel->findAll();
+            
+            // Ensure proper data types
+            foreach ($tasks as &$task) {
+                $task['id'] = (int) $task['id'];
+                $task['completed'] = (int) $task['completed'];
+            }
+            
             return $this->response->setJSON($tasks);
         } catch (\Exception $e) {
             log_message('error', 'Error fetching tasks: ' . $e->getMessage());
@@ -112,6 +119,13 @@ class Tasks extends BaseController
             }
 
             $task = $this->taskModel->find($id);
+            
+            // Ensure proper data types
+            if ($task) {
+                $task['id'] = (int) $task['id'];
+                $task['completed'] = (int) $task['completed'];
+            }
+            
             $location = base_url("tasks/{$id}");
             
             // Se implementa sugerencia para mejorar código en respuesta 201

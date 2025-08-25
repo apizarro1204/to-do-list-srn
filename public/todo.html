@@ -5,16 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
     <link rel="stylesheet" href="/css/todo.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>To-Do List</h1>
-        <form id="task-form">
-            <input type="text" id="task-title" placeholder="Nueva tarea..." required>
-            <button type="submit">Agregar</button>
-        </form>
-        <ul id="task-list"></ul>
+        <header class="app-header">
+            <h1><i class="fas fa-tasks"></i> To-Do List</h1>
+        </header>
+
+        <!-- Formulario para agregar tareas -->
+        <section class="add-task-section">
+            <form id="task-form" class="task-form">
+                <div class="input-group">
+                    <input type="text" id="task-title" placeholder="¿Qué necesitas hacer hoy?" required>
+                    <button type="submit" class="btn-add">
+                        <i class="fas fa-plus"></i> Agregar
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Filtros y búsqueda -->
+        <section class="filters-section">
+            <div class="filter-group">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Buscar tareas...">
+                </div>
+                <div class="date-filter">
+                    <label for="date-filter">
+                        <i class="fas fa-calendar"></i>
+                        <input type="date" id="date-filter">
+                    </label>
+                </div>
+                <div class="sort-options">
+                    <select id="sort-select">
+                        <option value="newest">Más recientes</option>
+                        <option value="oldest">Más antiguas</option>
+                        <option value="alphabetical">A-Z</option>
+                        <option value="reverse-alphabetical">Z-A</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sistema de pestañas -->
+        <section class="tabs-section">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="pending">
+                    <i class="fas fa-clock"></i>
+                    <span>Pendientes</span>
+                    <span class="badge" id="pending-count">0</span>
+                </button>
+                <button class="tab-btn" data-tab="completed">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Completadas</span>
+                    <span class="badge" id="completed-count">0</span>
+                </button>
+            </div>
+
+            <div class="tabs-content">
+                <!-- Pestaña de tareas pendientes -->
+                <div class="tab-panel active" id="pending-panel">
+                    <div class="panel-header">
+                        <h3>Tareas Pendientes</h3>
+                        <div class="quick-actions">
+                            <button class="btn-secondary" id="mark-all-completed">
+                                <i class="fas fa-check-double"></i> Marcar todas
+                            </button>
+                        </div>
+                    </div>
+                    <ul id="pending-task-list" class="task-list">
+                        <!-- Las tareas pendientes se cargarán aquí -->
+                    </ul>
+                    <div class="empty-state" id="pending-empty" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <p>¡Excelente! No tienes tareas pendientes</p>
+                    </div>
+                </div>
+
+                <!-- Pestaña de tareas completadas -->
+                <div class="tab-panel" id="completed-panel">
+                    <div class="panel-header">
+                        <h3>Tareas Completadas</h3>
+                        <div class="quick-actions">
+                            <button class="btn-danger" id="clear-completed">
+                                <i class="fas fa-trash"></i> Limpiar completadas
+                            </button>
+                        </div>
+                    </div>
+                    <ul id="completed-task-list" class="task-list">
+                        <!-- Las tareas completadas se cargarán aquí -->
+                    </ul>
+                    <div class="empty-state" id="completed-empty" style="display: none;">
+                        <i class="fas fa-trophy"></i>
+                        <p>Aún no has completado ninguna tarea</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Cargando...</p>
+        </div>
+    </div>
+
     <script src="/js/todo.js"></script>
 </body>
 </html>

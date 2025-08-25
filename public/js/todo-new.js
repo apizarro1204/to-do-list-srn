@@ -99,14 +99,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             allTasks = await response.json();
-            
-            // Normalize data types
-            allTasks = allTasks.map(task => ({
-                ...task,
-                id: parseInt(task.id),
-                completed: parseInt(task.completed)
-            }));
-            
             renderTasks();
             updateCounts();
             
@@ -147,13 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error(errorData.error || 'Error al crear la tarea');
             }
             
-            const responseData = await response.json();
-            const newTask = {
-                ...responseData.task,
-                id: parseInt(responseData.task.id),
-                completed: parseInt(responseData.task.completed)
-            };
-            
+            const newTask = await response.json();
             allTasks.unshift(newTask);
             
             // Clear form and update UI
@@ -240,9 +226,9 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Filter by completion status
         if (currentTab === 'pending') {
-            filtered = filtered.filter(task => !parseInt(task.completed));
+            filtered = filtered.filter(task => !task.completed);
         } else {
-            filtered = filtered.filter(task => parseInt(task.completed));
+            filtered = filtered.filter(task => task.completed);
         }
         
         // Filter by search term
@@ -354,8 +340,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error(errorData.error || 'Error al actualizar la tarea');
             }
             
-            // Update local state  
-            task.completed = newStatus ? 1 : 0;
+            // Update local state
+            task.completed = newStatus;
             renderTasks();
             updateCounts();
             
@@ -662,18 +648,7 @@ document.addEventListener('DOMContentLoaded', function () {
      * @returns {string}
      */
     function formatDate(dateString) {
-        // Handle null, undefined, or empty dates
-        if (!dateString) {
-            return 'Fecha no disponible';
-        }
-        
         const date = new Date(dateString);
-        
-        // Check if date is valid
-        if (isNaN(date.getTime())) {
-            return 'Fecha inválida';
-        }
-        
         const now = new Date();
         const diffTime = Math.abs(now - date);
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));

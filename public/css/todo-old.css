@@ -1,0 +1,337 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 400px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+h1 {
+    text-align: center;
+    color: #333;
+}
+#task-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1em;
+}
+#task-title {
+    flex: 1;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+button {
+    padding: 0.5em 1em;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+button:hover {
+    background: #0056b3;
+}
+#task-list {
+    list-style: none;
+    padding: 0;
+}
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5em 0;
+    border-bottom: 1px solid #eee;
+}
+.task-title {
+    flex: 1;
+    cursor: default;
+    margin-left: 8px;
+}
+.task-title.completed {
+    text-decoration: line-through;
+    color: #888;
+}
+.edit-input {
+    flex: 1;
+    padding: 0.3em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-left: 8px;
+}
+.edit-btn, .save-btn, .delete-btn {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.3em 0.7em;
+    cursor: pointer;
+    margin-left: 4px;
+}
+.edit-btn:hover, .save-btn:hover {
+    background: #0056b3;
+}
+.delete-btn {
+    background: #dc3545;
+}
+.delete-btn:hover {
+    background: #a71d2a;
+}
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification-success {
+    background: #28a745;
+}
+
+.notification-error {
+    background: #dc3545;
+}
+
+.notification-info {
+    background: #17a2b8;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Loading styles */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Improved form validation styles */
+.form-error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-success {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Better responsive design */
+@media (max-width: 480px) {
+    .container {
+        margin: 20px;
+        padding: 1em;
+    }
+    
+    .task-item {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    
+    .edit-btn, .save-btn, .delete-btn {
+        padding: 0.2em 0.5em;
+        font-size: 0.9em;
+    }
+}
+
+/* Accessibility improvements */
+.task-item:focus-within {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+button:focus,
+input:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+#task-form.loading {
+    position: relative;
+}
+
+#task-form.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 4px;
+    z-index: 1;
+}
+
+button:disabled {
+    background: #6c757d !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+input:disabled {
+    background: #f8f9fa;
+    cursor: not-allowed;
+}
+
+#task-list.loading {
+    position: relative;
+    min-height: 100px;
+}
+
+#task-list.loading::after {
+    content: 'Cargando...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1em 2em;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    z-index: 2;
+}
+
+/* Enhanced notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    max-width: 300px;
+    word-wrap: break-word;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    to {
+        transform: translateX(0);
+    }
+}
+
+.notification-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.notification-error {
+    background: linear-gradient(135deg, #dc3545, #e74c3c);
+}
+
+.notification-info {
+    background: linear-gradient(135deg, #17a2b8, #6f42c1);
+}
+
+/* Loading spinner for buttons */
+.btn-loading {
+    position: relative;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Validation error states */
+.input-error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.1rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.input-error:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+/* Connection status indicator */
+.connection-status {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.connection-status.show {
+    opacity: 1;
+}
+
+.connection-status.offline {
+    background: #dc3545;
+    color: white;
+}
+
+.connection-status.online {
+    background: #28a745;
+    color: white;
+}
